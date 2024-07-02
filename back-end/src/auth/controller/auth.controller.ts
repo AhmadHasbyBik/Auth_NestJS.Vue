@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, UseGuards } from '@nestjs/common';
 import { AuthService } from '../service/auth.service';
 import { JwtAuthGuard } from '../jwt/jwt-auth.guard';
 import { User } from '../../user/user.entity';
@@ -21,12 +21,8 @@ export class AuthController {
       body.password,
     );
 
-    if (body.username != user.username) {
+    if (!user) {
       return { message: 'Invalid username' };
-    }
-
-    if (body.password != user.password) {
-      return { message: 'Invalid password' };
     }
 
     return this.authService.login(user);
@@ -36,5 +32,11 @@ export class AuthController {
   @Get('profile') // Menggunakan @Get untuk endpoint profile
   async getProfile(): Promise<User[]> {
     return this.authService.getAllUsers();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile/:id') // Endpoint untuk mendapatkan user berdasarkan ID
+  async getProfileById(@Param('id') id: string): Promise<User> {
+    return this.authService.getUserById(+id);
   }
 }

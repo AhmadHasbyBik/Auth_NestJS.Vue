@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -40,10 +40,22 @@ export class AuthService {
     const payload = { username: user.username, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
+      sub: user.id,
     };
   }
 
   async getAllUsers(): Promise<User[]> {
     return this.usersRepository.find();
+  }
+
+  async getUserById(id: number): Promise<User> {
+    const user = await this.usersRepository.findOne({
+      where: { id },
+      select: ['id', 'name', 'username'],
+    });
+    if (!user) {
+      throw new NotFoundException(`User with ID '${id}' not found`);
+    }
+    return user;
   }
 }

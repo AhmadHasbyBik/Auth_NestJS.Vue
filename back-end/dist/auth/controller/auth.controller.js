@@ -25,16 +25,16 @@ let AuthController = class AuthController {
     }
     async login(body) {
         const user = await this.authService.validateUser(body.username, body.password);
-        if (body.username != user.username) {
+        if (!user) {
             return { message: 'Invalid username' };
-        }
-        if (body.password != user.password) {
-            return { message: 'Invalid password' };
         }
         return this.authService.login(user);
     }
     async getProfile() {
         return this.authService.getAllUsers();
+    }
+    async getProfileById(id) {
+        return this.authService.getUserById(+id);
     }
 };
 exports.AuthController = AuthController;
@@ -59,6 +59,14 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "getProfile", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Get)('profile/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "getProfileById", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

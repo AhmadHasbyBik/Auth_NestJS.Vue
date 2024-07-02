@@ -13,8 +13,10 @@ export declare class AuthController {
         password: string;
     }): Promise<{
         access_token: string;
+        sub: any;
     } | {
         message: string;
     }>;
     getProfile(): Promise<User[]>;
+    getProfileById(id: string): Promise<User>;
 }
